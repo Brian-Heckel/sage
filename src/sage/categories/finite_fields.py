@@ -244,7 +244,7 @@ class FiniteFields(CategoryWithAxiom):
             raise AssertionError("no element found")
 
     class ElementMethods:
-                def is_square(self):
+        def is_square(self):
             q = self.parent().order()
             if q % 2  == 0:
                 return True
