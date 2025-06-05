@@ -244,4 +244,47 @@ class FiniteFields(CategoryWithAxiom):
             raise AssertionError("no element found")
 
     class ElementMethods:
-        pass
+                def is_square(self):
+            q = self.parent().order()
+            if q % 2  == 0:
+                return True
+            character = self**(int((q-1)/2))
+            return character == self.parent().one()
+
+        def tonelli(self):
+            """
+            Computes the square root of the element
+            """
+            q = self.parent().cardinality()
+            if not self.is_square():
+                return None
+            g = self.parent().random_element()
+            while g.is_square():
+                g = self.parent().random_element()
+            odd_order = (q - 1).odd_part()
+            even_exp = Integer.factor(q-1)[0][1]
+            e = 0
+            two = self.parent().one() + self.parent().one()
+            for i in range(2, even_exp+1):
+                tmp = self * (g**(-e))
+
+                condition = tmp**(int((q-1)/(2**i))) != self.parent().one()
+                if condition:
+                    e = two**(i-1) + e
+            h = self * (g**(-e))
+            b = g**(e//2) * h**((odd_order+1)//2)
+            return b
+
+        def cipolla(self):
+            parent = self.parent()
+            if not self.is_square():
+                return None
+            t = parent.random_element()
+            root = t**2 - 4 * self
+            while root.is_square():
+                t = parent.random_element()
+                root = t**2 - 4 * self
+            X = polygen(S)
+            f = X**2 - t*X + self
+            b = (X**((q+1)//2)).quo_rem(f)
+            return b
