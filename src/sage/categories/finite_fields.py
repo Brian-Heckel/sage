@@ -176,6 +176,7 @@ class FiniteFields(CategoryWithAxiom):
                 sage: z ^ p
                 1
             """
+            print("Called Zeta")
             if n is None:
                 return self.multiplicative_generator()
 
@@ -244,4 +245,107 @@ class FiniteFields(CategoryWithAxiom):
             raise AssertionError("no element found")
 
     class ElementMethods:
-        pass
+        def is_square(self, root=False):
+            """
+            Tests if the element is a square or has
+            a square root element
+
+            INPUT:
+
+            - ``root`` - boolean (default: ``False``); computes the square
+              root and returns it if the element is a square root
+
+            OUTPUT:
+            - if ``root=False`` a boolean for the test of the square
+
+            - if ``root=True`` a 2-tuple where the first entry is the
+              boolean result of the test and the second entry is the
+              square root if the element is a square or None if the
+              element is not a square
+            """
+            q = self.parent().order()
+            if q % 2  == 0:
+                return True
+            character = self**((q-1)//2)
+            is_square = character == self.parent().one()
+            if root and is_square:
+                return (True, self.sqrt())
+            if root and not is_square:
+                return (False, None)
+            return is_square
+
+        def tonelli(self):
+            """
+            Computes the square root of the element
+            """
+            q = self.parent().cardinality()
+            if not self.is_square():
+                return None
+            g = self.parent().random_element()
+            while g.is_square():
+                g = self.parent().random_element()
+            odd_order = (q - 1).odd_part()
+            even_exp = Integer.valuation(q-1, 2)
+            e = 0
+            for i in range(2, even_exp+1):
+                tmp = self * (pow(g, -e))
+
+                condition = tmp**((q-1)//(2**i)) != self.parent().one()
+                if condition:
+                    e = 2**(i-1) + e
+            h = self * (g**(-e))
+            b = g**(e//2) * h**((odd_order+1)//2)
+            return b
+
+        def cipolla(self):
+            parent = self.parent()
+            q = parent.cardinality()
+            if not self.is_square():
+                return None
+            t = parent.random_element()
+            root = t**2 - 4 * self
+            while root.is_square():
+                t = parent.random_element()
+                root = t**2 - 4 * self
+            from sage.rings.polynomial.polynomial_ring import polygen
+            X = polygen(parent)
+            f = X**2 - t*X + self
+            b = (X**((q+1)//2)).quo_rem(f)[1]
+            square_root = b.constant_coefficient()
+            return square_root
+
+        def sqrt(self, all=False):
+            """
+            Returns the square root of the element if it exists
+
+            INPUT:
+
+            - ``all`` -- boolean (default: ``False``); whether to return a list of
+              all square roots or just a square root
+
+            OUTPUT:
+
+            - if ``all=False``, a square root; raises an error if the element is not
+              a square
+
+            - if ``all=True``, a 2-tuple of square roots; raises an error if the
+             element is not a square
+            """
+            order = self.parent().order()
+            if not self.is_square():
+                # FIXME: Add proper error handling
+                raise ValueError("Element must be a square")
+            if order % 2 == 0:
+                # TODO add easy case
+                exponent = order // 2
+                square_root = self**exponent
+            elif order % 4 == 3:
+                square_root = self**((order+1)//4)
+            else:
+                square_root = self.tonelli()
+            if all:
+                return [square_root, -square_root]
+            return square_root
+
+
+
