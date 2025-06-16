@@ -176,7 +176,6 @@ class FiniteFields(CategoryWithAxiom):
                 sage: z ^ p
                 1
             """
-            print("Called Zeta")
             if n is None:
                 return self.multiplicative_generator()
 
@@ -336,7 +335,6 @@ class FiniteFields(CategoryWithAxiom):
                 # FIXME: Add proper error handling
                 raise ValueError("Element must be a square")
             if order % 2 == 0:
-                # TODO add easy case
                 exponent = order // 2
                 square_root = self**exponent
             elif order % 4 == 3:
