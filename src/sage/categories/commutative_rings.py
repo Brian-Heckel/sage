@@ -540,7 +540,49 @@ class CommutativeRings(CategoryWithAxiom):
             return self.derivation_module(codomain, twist=twist)(arg)
 
     class ElementMethods:
-        pass
+        def is_square(self, root=False):
+            """
+            Return whether or not the ring element ``self`` is a square.
+
+            If the optional argument root is ``True``, then also return
+
+
+            the square root (or ``None``, if it is not a square).
+
+            INPUT:
+
+            - ``root`` -- boolean (default: ``False``); whether or not to also
+              return a square root
+
+            OUTPUT:
+
+            - boolean; whether or not a square
+
+            - object; (optional) an actual square root if found, and ``None``
+              otherwise
+
+            EXAMPLES::
+
+                sage: R.<x> = PolynomialRing(QQ)
+                sage: f = 12*(x+1)^2 * (x+3)^2
+                sage: f.is_square()
+                False
+                sage: f.is_square(root=True)
+                (False, None)
+                sage: h = f/3
+                sage: h.is_square()
+                True
+                sage: h.is_square(root=True)
+                (True, 2*x^2 + 8*x + 6)
+
+            .. NOTE::
+
+                This is the is_square implementation for general commutative ring
+                elements. It's implementation is to raise a
+                :exc:`NotImplementedError`. The function definition is here to show
+                what functionality is expected and provide a general framework.
+            """
+            raise NotImplementedError("is_square() not implemented for elements of %s" % self.parent())
 
     class Finite(CategoryWithAxiom):
         r"""
