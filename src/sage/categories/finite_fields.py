@@ -262,6 +262,8 @@ class FiniteFields(CategoryWithAxiom):
               square root if the element is a square or None if the
               element is not a square
             """
+            if self.is_zero():
+                return True
             q = self.parent().order()
             if q % 2  == 0:
                 return True
@@ -309,9 +311,8 @@ class FiniteFields(CategoryWithAxiom):
             from sage.rings.polynomial.polynomial_ring import polygen
             X = polygen(parent)
             f = X**2 - t*X + self
-            b = (X**((q+1)//2)).quo_rem(f)[1]
-            square_root = b.constant_coefficient()
-            return square_root
+            b = pow(X, (q+1)//2, f)
+            return b
 
         def sqrt(self, all=False):
             """
