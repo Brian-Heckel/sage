@@ -12,9 +12,12 @@ Finite fields
 #                  https://www.gnu.org/licenses/
 # *****************************************************************************
 
+from functools import cache
+
 from sage.categories.category_with_axiom import CategoryWithAxiom
 from sage.categories.enumerated_sets import EnumeratedSets
 from sage.rings.integer import Integer
+
 
 
 class FiniteFields(CategoryWithAxiom):
@@ -243,6 +246,19 @@ class FiniteFields(CategoryWithAxiom):
                     return a
             raise AssertionError("no element found")
 
+        @cache
+        def _non_square_element(self):
+            # if the order is an even power of two
+            # then every element is a square
+            assert(self.order() % 2 == 1)
+
+            # uniformly randomly select elements for a non-square
+            # with probablity 1/2 for a non-square
+            element = self.random_element()
+            while not element.is_square():
+                element = self.random_element()
+            return element
+
     class ElementMethods:
         def is_square(self, root=False):
             """
@@ -282,9 +298,7 @@ class FiniteFields(CategoryWithAxiom):
             q = self.parent().cardinality()
             if not self.is_square():
                 return None
-            g = self.parent().random_element()
-            while g.is_square():
-                g = self.parent().random_element()
+            g = self.parent()._non_square_element()
             odd_order = (q - 1).odd_part()
             even_exp = Integer.valuation(q-1, 2)
             e = 0
