@@ -12,12 +12,11 @@ Finite fields
 #                  https://www.gnu.org/licenses/
 # *****************************************************************************
 
-from functools import cache
-
 from sage.categories.category_with_axiom import CategoryWithAxiom
 from sage.categories.enumerated_sets import EnumeratedSets
 from sage.rings.integer import Integer
 
+from sage.misc.cachefunc import cached_method
 
 
 class FiniteFields(CategoryWithAxiom):
@@ -246,12 +245,26 @@ class FiniteFields(CategoryWithAxiom):
                     return a
             raise AssertionError("no element found")
 
-        @cache
+        @cached_method
         def _non_square_element(self):
+            """
+            Returns a random non square element of the finite field
+
+            OUTPUTS:
+                - a non-square element of the finite field; raises an error if
+                  the finite field is of even order
+
+            EXAMPLES::
+                sage: k = GF((2, 10))
+                sage: k in Fields()  # to let k be a finite field
+                True
+                sage: k._non_square_element()
+                ValueError: There are no non-squares in finite fields of even order
+            """
             # if the order is an even power of two
             # then every element is a square
-            assert(self.order() % 2 == 1)
-
+            if self.order() % 2 == 0:
+                raise ValueError("There are no non-squares in finite fields of even order")
             # uniformly randomly select elements for a non-square
             # with probablity 1/2 for a non-square
             element = self.random_element()
