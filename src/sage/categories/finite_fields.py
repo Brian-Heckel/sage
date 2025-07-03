@@ -301,18 +301,21 @@ class FiniteFields(CategoryWithAxiom):
                 sage: k._non_square_element().sqrt()
                 False
             """
+            is_square = None
             if self.is_zero():
-                return True
+                is_square = True
             q = self.parent().order()
             if q % 2  == 0:
-                return True
-            character = self**((q-1)//2)
-            is_square = character == self.parent().one()
+                is_square = True
+            else:
+                character = self**((q-1)//2)
+                is_square = character == self.parent().one()
             if root and is_square:
                 return (True, self.sqrt())
             if root and not is_square:
                 return (False, None)
-            return is_square
+            else:
+                return is_square
 
         def tonelli(self):
             """
