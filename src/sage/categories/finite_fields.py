@@ -255,6 +255,9 @@ class FiniteFields(CategoryWithAxiom):
                   the finite field is of even order
 
             EXAMPLES::
+                sage: k = GF((3, 10))
+                sage: k._non_square_element().is_square()
+                False
                 sage: k = GF((2, 10))
                 sage: k in Fields()  # to let k be a finite field
                 True
@@ -268,7 +271,7 @@ class FiniteFields(CategoryWithAxiom):
             # uniformly randomly select elements for a non-square
             # with probablity 1/2 for a non-square
             element = self.random_element()
-            while not element.is_square():
+            while element.is_square():
                 element = self.random_element()
             return element
 
@@ -290,6 +293,13 @@ class FiniteFields(CategoryWithAxiom):
               boolean result of the test and the second entry is the
               square root if the element is a square or None if the
               element is not a square
+
+            EXAMPLES::
+                sage: k.<a> = GF((5, 10))
+                sage: k(2).is_square()
+                True
+                sage: k._non_square_element().sqrt()
+                False
             """
             if self.is_zero():
                 return True
@@ -306,11 +316,26 @@ class FiniteFields(CategoryWithAxiom):
 
         def tonelli(self):
             """
-            Computes the square root of the element
+            Returns a square root of the element if it exists
+            using tonelli's algorithm
+
+            OUTPUT:
+
+            - A square root of the element; raises an error
+              if the element is not a square
+
+            EXAMPLES::
+                sage: k.<a> = GF((5, 10))
+                sage: k(2).is_square()
+                True
+                sage: k(2).tonelli()^2 == k(2)
+                True
+                sage: k._non_square_element().tonelli()
+                ValueError: element is not a square
             """
             q = self.parent().cardinality()
             if not self.is_square():
-                return None
+                raise ValueError("Element is not a square")
             g = self.parent()._non_square_element()
             odd_order = (q - 1).odd_part()
             even_exp = Integer.valuation(q-1, 2)
@@ -326,10 +351,29 @@ class FiniteFields(CategoryWithAxiom):
             return b
 
         def cipolla(self):
+            """
+            Returns a square root of the element if it exists
+            using cipolla's algorithm, more suited if order - 1
+            is highly divisible by 2
+
+            OUTPUT:
+
+            - A square root of the element; raises an error
+              if the element is not a square
+
+            EXAMPLES::
+                sage: k.<a> = GF((5, 10))
+                sage: k(2).is_square()
+                True
+                sage: k(2).cipolla()^2 == k(2)
+                True
+                sage: k._non_square_element().cipolla()
+                ValueError: element is not a square
+            """
             parent = self.parent()
             q = parent.cardinality()
             if not self.is_square():
-                return None
+                raise ValueError("Element is not a square")
             t = parent.random_element()
             root = t**2 - 4 * self
             while root.is_square():
@@ -357,11 +401,31 @@ class FiniteFields(CategoryWithAxiom):
 
             - if ``all=True``, a 2-tuple of square roots; raises an error if the
              element is not a square
+
+            EXAMPLES::
+                sage: k.<a> = GF((5, 10))
+                sage: k(2).is_square()
+                True
+                sage: k(2).sqrt()^2 == k(2)
+                True
+                sage: k(4).sqrt(all=True)
+                (2, 3)
+                sage: k._non_square_element().sqrt()
+                ValueError: element is not a square
+
+            ALGORITHM:
+
+            The following algorithm comes from chapter 8 of [BS1996]_.
+
+            If `q = p^n` is the order of the finite field then if
+            `p = 2` or divisible by 2 then we can compute the
+            square root by `a^(q/2)` if q is 3 modulo 4 then we
+            can compute the square root by `a^((q+1)/4)` otherwise
+            we use tonelli's method for all other cases in general.
             """
             order = self.parent().order()
             if not self.is_square():
-                # FIXME: Add proper error handling
-                raise ValueError("Element must be a square")
+                raise ValueError("Element is not a square")
             if order % 2 == 0:
                 exponent = order // 2
                 square_root = self**exponent
@@ -370,7 +434,7 @@ class FiniteFields(CategoryWithAxiom):
             else:
                 square_root = self.tonelli()
             if all:
-                return [square_root, -square_root]
+                return (square_root, -square_root)
             return square_root
 
 
