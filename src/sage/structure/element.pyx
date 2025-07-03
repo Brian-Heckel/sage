@@ -4328,6 +4328,7 @@ cdef class FieldElement(CommutativeRingElement):
             return (P.zero(), P.one())
         return (P.one(), self)
 
+
 def is_AlgebraElement(x):
     """
     Return ``True`` if x is of type AlgebraElement.
