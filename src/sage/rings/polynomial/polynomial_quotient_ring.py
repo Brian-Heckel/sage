@@ -343,7 +343,7 @@ class PolynomialQuotientRing_generic(QuotientRing_generic):
          'inverse_of_unit',
          'is_idempotent',
          'is_one',
-         'is_square'
+         'is_square',
          'is_unit',
          'lift',
          'powers',
