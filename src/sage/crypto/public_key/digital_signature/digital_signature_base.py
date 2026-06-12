@@ -24,11 +24,11 @@ AUTHORS:
 # ****************************************************************************
 
 
-from sage.structure.sage_object import SageObject
-from sage.misc.superseded import experimental_warning
 from abc import abstractmethod
-
 from typing import Any
+
+from sage.misc.superseded import experimental_warning
+from sage.structure.sage_object import SageObject
 
 experimental_warning(
     41218,
@@ -43,7 +43,7 @@ class DigitalSignatureBase(SageObject):
     Implementers of this class must implement all abstract methods
     defined in :meth:`DigitalSignatureBase`.
     """
-    
+
     @abstractmethod
     def generate_keys(self) -> tuple[Any, Any]:
         """
@@ -70,8 +70,8 @@ class DigitalSignatureBase(SageObject):
 
         Returns a pair of (signature, message)
         """
-        raise NotImplentedError
-    
+        raise NotImplementedError
+
     @abstractmethod
     def verify(self, public_key, signature, message) -> bool:
         """
@@ -89,7 +89,7 @@ class DigitalSignatureBase(SageObject):
         False if not.
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def parameters(self):
         """
@@ -152,4 +152,4 @@ class DigitalSignatureBase(SageObject):
         tester.assertTrue(result)
 
 
-          
+

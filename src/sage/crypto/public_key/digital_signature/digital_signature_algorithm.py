@@ -1,12 +1,14 @@
 
-from .digital_signature_base import DigitalSignatureBase
-from sage.misc.prandom import randint
-from sage.rings.integer import Integer
-from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
 from sage.arith.misc import is_prime
+from sage.misc.prandom import randint
+from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
+from sage.rings.integer import Integer
+
+from .digital_signature_base import DigitalSignatureBase
+
 
 class DigitalSignatureAlgorithm(DigitalSignatureBase):
-    
+
     def __init__(self, p, q, generator):
         r"""
         Create an instance of the Digital Signature Algorithm using
@@ -44,8 +46,8 @@ class DigitalSignatureAlgorithm(DigitalSignatureBase):
         self.pZmod = IntegerModRing(p)
         self.qZmod = IntegerModRing(q)
         self.generator = self.pZmod(generator)
-        
-    
+
+
     def generate_keys(self):
         """
         Generates a keypair to be used for signatures
@@ -75,7 +77,7 @@ class DigitalSignatureAlgorithm(DigitalSignatureBase):
         r = self.qZmod(self.pZmod(self.generator**k))
         s = self.qZmod(k)**(-1) * (self.qZmod(message) + self.qZmod(secret_key) * r)
         return ((r, s), message)
-    
+
     def verify(self, public_key, signature, message):
         """
         Verifies that the signature is valid
@@ -100,7 +102,7 @@ class DigitalSignatureAlgorithm(DigitalSignatureBase):
             self.generator**u1 * public_key**u2
         )
         return v == r
-    
+
     def parameters(self):
         """
         Returns the public parameter set, which is of the form ``(p, q, generator)``
